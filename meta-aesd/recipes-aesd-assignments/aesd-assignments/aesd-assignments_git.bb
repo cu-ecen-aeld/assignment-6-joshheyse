@@ -2,13 +2,19 @@
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
+RDEPENDS:${PN} += "libgcc"
+
+inherit update-rc.d
+INITSCRIPT_PACKAGES = "${PN}"
+INITSCRIPT_NAME:${PN} = "aesdsocket-start-stop"
+
 # TODO: Set this  with the path to your assignments rep.  Use ssh protocol and see lecture notes
 # about how to setup ssh-agent for passwordless access
 SRC_URI = "git://git@github.com/cu-ecen-aeld/assignments-3-and-later-joshheyse.git;protocol=ssh;branch=master"
 
 PV = "1.0+git${SRCPV}"
 # TODO: set to reference a specific commit hash in your assignment repo
-SRCREV = "d916f7b50241f25b88949b4b15ef895298b80c84"
+SRCREV = "9cfbc30fb785f70b6b565b1538661c21c8b9ac18"
 
 # This sets your staging directory based on WORKDIR, where WORKDIR is defined at 
 # https://docs.yoctoproject.org/ref-manual/variables.html?highlight=workdir#term-WORKDIR
@@ -18,15 +24,10 @@ S = "${WORKDIR}/git/server"
 
 # TODO: Add the aesdsocket application and any other files you need to install
 # See https://git.yoctoproject.org/poky/plain/meta/conf/bitbake.conf?h=kirkstone
-FILES:${PN} += "${bindir}/aesdsocket"
+FILES:${PN} += "${bindir}/aesdsocket ${bindir}/aesdsocket-start-stop"
 # TODO: customize these as necessary for any libraries you need for your application
 # (and remove comment)
 TARGET_LDFLAGS += "-pthread -lrt"
-
-inherit update-rc.d
-
-INITSCRIPT_PACKAGES = "${PN}"
-INITSCRIPT_NAME:${PN} = "aesdsocket-start-stop"
 
 do_configure () {
 	:
@@ -38,10 +39,10 @@ do_compile () {
 
 do_install () {
   install -d ${D}${bindir}
-  install -m 0755 ${S}/aesdsocket ${D}${bindir}/aesdsocket
+  install -m 0755 ${S}/aesdsocket ${D}${bindir}/
 
   install -d ${D}${sysconfdir}/init.d
-  install -m 0744 ${S}/aesdsocket-start-stop ${D}${sysconfdir}/init.d/aesdsocket-start-stop
+  install -m 0744 ${S}/aesdsocket-start-stop ${D}${sysconfdir}/init.d/
 
 	# TODO: Install your binaries/scripts here.
 	# Be sure to install the target directory with install -d first
